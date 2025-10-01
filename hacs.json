@@ -1,6 +1,6 @@
 {
-    "name": "Mikrotik SwitchOS Lite",
+    "name": "Mikrotik SwitchOS",
     "homeassistant": "2025.1",
     "zip_release": true,
-    "filename": "ha_swos_lite.zip"
+    "filename": "ha_switchos.zip"
 }

@@ -5,11 +5,11 @@ import logging
 from typing import Any
 
 from httpx import AsyncClient, DigestAuth, HTTPStatusError, TransportError
-from python_swos_lite.client import Client
-from python_swos_lite.endpoints.link import LinkEndpoint
-from python_swos_lite.endpoints.poe import PoEEndpoint
-from python_swos_lite.endpoints.sys import SystemEndpoint
-from python_swos_lite.http import createHttpClient
+from python_switchos.client import Client
+from python_switchos.endpoints.link import LinkEndpoint
+from python_switchos.endpoints.poe import PoEEndpoint
+from python_switchos.endpoints.sys import SystemEndpoint
+from python_switchos.http import createHttpClient
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -28,10 +28,10 @@ from .port import Port
 
 _LOGGER = logging.getLogger(__name__)
 
-type MikrotikSwosLiteConfigEntry = ConfigEntry[MikrotikSwosLiteCoordinator]
+type MikrotikSwitchOSConfigEntry = ConfigEntry[MikrotikSwitchOSCoordinator]
 
 
-class MikrotikSwosLiteData:
+class MikrotikSwitchOSData:
     """Handle all communication with the Switch."""
 
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
@@ -63,13 +63,13 @@ class MikrotikSwosLiteData:
         return [Port(i, self.link) for i, _ in enumerate(self.link.enabled)]
 
 
-class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
-    """Mikrotik SwOs Lite Hub Object."""
+class MikrotikSwitchOSCoordinator(DataUpdateCoordinator[None]):
+    """Mikrotik SwitchOS Hub Object."""
 
-    config_entry: MikrotikSwosLiteConfigEntry
+    config_entry: MikrotikSwitchOSConfigEntry
 
     def __init__(
-        self, hass: HomeAssistant, config_entry: MikrotikSwosLiteConfigEntry
+        self, hass: HomeAssistant, config_entry: MikrotikSwitchOSConfigEntry
     ) -> None:
         """Initialize the Mikrotik Client."""
         super().__init__(
@@ -83,7 +83,7 @@ class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
                 )
             ),
         )
-        self._mk_data = MikrotikSwosLiteData(hass, config_entry)
+        self._mk_data = MikrotikSwitchOSData(hass, config_entry)
 
     @property
     def host(self) -> str:
@@ -116,7 +116,7 @@ class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
         return self._mk_data.device.mac
 
     @property
-    def api(self) -> MikrotikSwosLiteData:
+    def api(self) -> MikrotikSwitchOSData:
         """Represent Mikrotik Switch data object."""
         return self._mk_data
 
@@ -133,8 +133,8 @@ class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
             raise UpdateFailed("Error fetching data from API") from err
 
 
-class MikrotikSwosLiteDevice:
-    """Mikrotik SwitchOS Lite device."""
+class MikrotikSwitchOSDevice:
+    """Mikrotik SwitchOS device."""
 
     identity: str
     serial_num: str
@@ -145,7 +145,7 @@ class MikrotikSwosLiteDevice:
     def __init__(
         self, identity: str, serial_num: str, model: str, firmware: str, ports: int
     ) -> None:
-        """Initialize the Mikrotik Switch OS Lite device."""
+        """Initialize the Mikrotik Switch OS device."""
         self.identity = identity
         self.serial_num = serial_num
         self.model = model
@@ -155,7 +155,7 @@ class MikrotikSwosLiteDevice:
 
 async def test_connection(entry: dict[str, Any]) -> None:
     """Test connection to API with given settings."""
-    _LOGGER.debug("Connecting to Mikrotik SwitchOS Lite [%s]", entry[CONF_HOST])
+    _LOGGER.debug("Connecting to Mikrotik SwitchOS [%s]", entry[CONF_HOST])
 
     client = _create_client(entry)
     try:

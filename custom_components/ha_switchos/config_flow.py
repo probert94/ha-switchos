@@ -1,4 +1,4 @@
-"""Config flow for Mikrotik SwitchOS Lite integration."""
+"""Config flow for Mikrotik SwitchOS integration."""
 
 from collections.abc import Mapping
 from typing import Any
@@ -18,8 +18,8 @@ from .coordinator import test_connection
 from .errors import AuthError, CannotConnect
 
 
-class MikrotikSwosLiteConfigFlowHandler(ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Mikrotik SwitchOS Lite."""
+class MikrotikSwitchOSConfigFlowHandler(ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Mikrotik SwitchOS."""
 
     VERSION = 1
     MINOR_VERSION = 1

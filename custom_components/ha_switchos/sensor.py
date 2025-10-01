@@ -22,20 +22,20 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTR_MANUFACTURER, DOMAIN
-from .coordinator import MikrotikSwosLiteConfigEntry, MikrotikSwosLiteCoordinator
+from .coordinator import MikrotikSwitchOSConfigEntry, MikrotikSwitchOSCoordinator
 from .port import Port
 
 
 @dataclass(frozen=True, kw_only=True)
-class MikrotikSwOSLiteEntityDescription(SensorEntityDescription):
-    """Describes a Mikrotik SwitchOS Lite Sensor."""
+class MikrotikSwitchOSEntityDescription(SensorEntityDescription):
+    """Describes a Mikrotik SwitchOS Sensor."""
 
     endpoint: str
     property: str
 
 
-GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
-    MikrotikSwOSLiteEntityDescription(
+GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
+    MikrotikSwitchOSEntityDescription(
         key="cpu_temperature",
         translation_key="cpu_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -45,7 +45,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="sys",
         property="cpuTemp",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="psu1_current",
         translation_key="psu1_current",
         device_class=SensorDeviceClass.CURRENT,
@@ -55,7 +55,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="sys",
         property="psu1Current",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="psu1_voltage",
         translation_key="psu1_voltage",
         device_class=SensorDeviceClass.VOLTAGE,
@@ -65,7 +65,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="sys",
         property="psu1Voltage",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="psu2_current",
         translation_key="psu2_current",
         device_class=SensorDeviceClass.CURRENT,
@@ -75,7 +75,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="sys",
         property="psu2Current",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="psu2_voltage",
         translation_key="psu2_voltage",
         device_class=SensorDeviceClass.VOLTAGE,
@@ -85,7 +85,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="sys",
         property="psu2Voltage",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="total_power",
         translation_key="total_power",
         device_class=SensorDeviceClass.POWER,
@@ -97,8 +97,8 @@ GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
     ),
 )
 
-PORT_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
-    MikrotikSwOSLiteEntityDescription(
+PORT_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
+    MikrotikSwitchOSEntityDescription(
         key="poe_power",
         translation_key="poe_power",
         device_class=SensorDeviceClass.POWER,
@@ -108,7 +108,7 @@ PORT_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="poe",
         property="power",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="poe_current",
         translation_key="poe_current",
         device_class=SensorDeviceClass.CURRENT,
@@ -118,7 +118,7 @@ PORT_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
         endpoint="poe",
         property="current",
     ),
-    MikrotikSwOSLiteEntityDescription(
+    MikrotikSwitchOSEntityDescription(
         key="poe_voltage",
         translation_key="poe_voltage",
         device_class=SensorDeviceClass.VOLTAGE,
@@ -133,10 +133,10 @@ PORT_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
 
 async def async_setup_entry(
     _: HomeAssistant,
-    config_entry: MikrotikSwosLiteConfigEntry,
+    config_entry: MikrotikSwitchOSConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Setup sensor for Mikrotik SwitchOS Lite component."""
+    """Setup sensor for Mikrotik SwitchOS component."""
     coordinator = config_entry.runtime_data
 
     device = {
@@ -151,31 +151,31 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            MikrotikSwosLiteSensor(coordinator, device, global_sensor)
+            MikrotikSwitchOSSensor(coordinator, device, global_sensor)
             for global_sensor in GLOBAL_SENSORS
         ]
     )
     async_add_entities(
         [
-            MikrotikSwosLitePortSensor(coordinator, device, port_sensor, port)
+            MikrotikSwitchOSPortSensor(coordinator, device, port_sensor, port)
             for port_sensor in PORT_SENSORS
             for port in coordinator.api.ports
         ]
     )
 
 
-class MikrotikSwosLiteSensor(
-    CoordinatorEntity[MikrotikSwosLiteCoordinator], SensorEntity
+class MikrotikSwitchOSSensor(
+    CoordinatorEntity[MikrotikSwitchOSCoordinator], SensorEntity
 ):
-    """Representation of a Mikrotik SwitchOS Lite Sensor."""
+    """Representation of a Mikrotik SwitchOS Sensor."""
 
-    entity_description: MikrotikSwOSLiteEntityDescription
+    entity_description: MikrotikSwitchOSEntityDescription
 
     def __init__(
         self,
-        coordinator: MikrotikSwosLiteCoordinator,
+        coordinator: MikrotikSwitchOSCoordinator,
         device: DeviceInfo,
-        entity_description: MikrotikSwOSLiteEntityDescription,
+        entity_description: MikrotikSwitchOSEntityDescription,
     ) -> None:
         """Initialize the sensor entity."""
         super().__init__(coordinator)
@@ -193,16 +193,16 @@ class MikrotikSwosLiteSensor(
         )
 
 
-class MikrotikSwosLitePortSensor(MikrotikSwosLiteSensor):
-    """Representation of a Mikrotik SwitchOS Lite Port Sensor."""
+class MikrotikSwitchOSPortSensor(MikrotikSwitchOSSensor):
+    """Representation of a Mikrotik SwitchOS Port Sensor."""
 
-    entity_description: MikrotikSwOSLiteEntityDescription
+    entity_description: MikrotikSwitchOSEntityDescription
 
     def __init__(
         self,
-        coordinator: MikrotikSwosLiteCoordinator,
+        coordinator: MikrotikSwitchOSCoordinator,
         device: DeviceInfo,
-        entity_description: MikrotikSwOSLiteEntityDescription,
+        entity_description: MikrotikSwitchOSEntityDescription,
         port: Port,
     ) -> None:
         """Initialize the sensor entity."""
