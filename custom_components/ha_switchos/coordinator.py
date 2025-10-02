@@ -1,5 +1,6 @@
 """The Mikrotik Switch class."""
 
+import contextlib
 from datetime import timedelta
 import logging
 from typing import Any
@@ -48,6 +49,9 @@ class MikrotikSwitchOSData:
         """Set up the data class by loading system information."""
         self.device = self.sys = await self.client.fetch(SystemEndpoint)
         self.link = await self.client.fetch(LinkEndpoint)
+        # Check if PoE is available for this Switch
+        with contextlib.suppress(HTTPStatusError):
+            self.poe = await self.client.fetch(PoEEndpoint)
 
     async def updateHealth(self):
         """Fetch system data."""
@@ -125,7 +129,8 @@ class MikrotikSwitchOSCoordinator(DataUpdateCoordinator[None]):
 
     async def _async_update_data(self):
         try:
-            await self._mk_data.updatePoE()
+            if self._mk_data.poe is not None:
+                await self._mk_data.updatePoE()
             await self._mk_data.updateHealth()
         except HTTPStatusError as err:
             if err.response.status_code == 401:

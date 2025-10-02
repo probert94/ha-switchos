@@ -29,11 +29,17 @@
             "psu1_voltage": {
                 "name": "Netzteil 1 - Spannung"
             },
+            "psu1_power": {
+                "name": "Netzteil 1 - Leistung"
+            },
             "psu2_current": {
                 "name": "Netzteil 2 - Strom"
             },
             "psu2_voltage": {
                 "name": "Netzteil 2 - Spannung"
+            },
+            "psu2_power": {
+                "name": "Netzteil 2 - Leistung"
             },
             "total_power": {
                 "name": "Leistung"

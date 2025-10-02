@@ -29,11 +29,17 @@
             "psu1_voltage": {
                 "name": "Power supply 1 - voltage"
             },
+            "psu1_power": {
+                "name": "Power supply 1 - power"
+            },
             "psu2_current": {
                 "name": "Power supply 2 - current"
             },
             "psu2_voltage": {
                 "name": "Power supply 2 - voltage"
+            },
+            "psu2_power": {
+                "name": "Power supply 2 - power"
             },
             "total_power": {
                 "name": "Power"

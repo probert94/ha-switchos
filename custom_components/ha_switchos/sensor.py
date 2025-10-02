@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from homeassistant.components.sensor import (
@@ -22,7 +23,11 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTR_MANUFACTURER, DOMAIN
-from .coordinator import MikrotikSwitchOSConfigEntry, MikrotikSwitchOSCoordinator
+from .coordinator import (
+    MikrotikSwitchOSConfigEntry,
+    MikrotikSwitchOSCoordinator,
+    MikrotikSwitchOSData,
+)
 from .port import Port
 
 
@@ -32,6 +37,7 @@ class MikrotikSwitchOSEntityDescription(SensorEntityDescription):
 
     endpoint: str
     property: str
+    enabled_by_default: Callable[[MikrotikSwitchOSData], bool] | None = None
 
 
 GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
@@ -54,6 +60,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         suggested_display_precision=0,
         endpoint="sys",
         property="psu1Current",
+        enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
         key="psu1_voltage",
@@ -64,6 +71,18 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         suggested_display_precision=2,
         endpoint="sys",
         property="psu1Voltage",
+        enabled_by_default=lambda api: api.poe is not None,
+    ),
+    MikrotikSwitchOSEntityDescription(
+        key="psu1_power",
+        translation_key="psu1_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        suggested_display_precision=1,
+        endpoint="sys",
+        property="psu1Power",
+        enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
         key="psu2_current",
@@ -74,6 +93,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         suggested_display_precision=0,
         endpoint="sys",
         property="psu2Current",
+        enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
         key="psu2_voltage",
@@ -84,6 +104,18 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         suggested_display_precision=2,
         endpoint="sys",
         property="psu2Voltage",
+        enabled_by_default=lambda api: api.poe is not None,
+    ),
+    MikrotikSwitchOSEntityDescription(
+        key="psu2_power",
+        translation_key="psu2_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        suggested_display_precision=1,
+        endpoint="sys",
+        property="psu2Power",
+        enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
         key="total_power",
@@ -94,6 +126,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         suggested_display_precision=1,
         endpoint="sys",
         property="power_consumption",
+        enabled_by_default=lambda api: api.poe is not None,
     ),
 )
 
@@ -153,6 +186,7 @@ async def async_setup_entry(
         [
             MikrotikSwitchOSSensor(coordinator, device, global_sensor)
             for global_sensor in GLOBAL_SENSORS
+            if _global_entity_exists(global_sensor, coordinator.api)
         ]
     )
     async_add_entities(
@@ -160,8 +194,29 @@ async def async_setup_entry(
             MikrotikSwitchOSPortSensor(coordinator, device, port_sensor, port)
             for port_sensor in PORT_SENSORS
             for port in coordinator.api.ports
+            if _port_entity_exists(port_sensor, coordinator.api, port)
         ]
     )
+
+
+def _global_entity_exists(
+    entity_desc: MikrotikSwitchOSEntityDescription, api: MikrotikSwitchOSData
+) -> bool:
+    return (
+        getattr(getattr(api, entity_desc.endpoint, None), entity_desc.property, None)
+        is not None
+    )
+
+
+def _port_entity_exists(
+    entity_desc: MikrotikSwitchOSEntityDescription,
+    api: MikrotikSwitchOSData,
+    port: Port,
+) -> bool:
+    value = getattr(
+        getattr(api, entity_desc.endpoint, None), entity_desc.property, None
+    )
+    return isinstance(value, (tuple, list)) and len(value) > port.num
 
 
 class MikrotikSwitchOSSensor(
@@ -190,6 +245,14 @@ class MikrotikSwitchOSSensor(
         return getattr(
             getattr(self.coordinator.api, self.entity_description.endpoint),
             self.entity_description.property,
+        )
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Returns whether the entity should be enabled by default."""
+        return (
+            self.entity_description.enabled_by_default is None
+            or self.entity_description.enabled_by_default(self.coordinator.api)
         )
 
 
