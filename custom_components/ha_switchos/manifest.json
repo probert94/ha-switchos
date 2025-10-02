@@ -6,7 +6,7 @@
   ],
   "documentation": "https://github.com/probert94/ha-switchos",
   "issue_tracker": "https://github.com/probert94/ha-switchos/issues",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "config_flow": true,
   "integration_type": "device",
   "iot_class": "local_polling",
