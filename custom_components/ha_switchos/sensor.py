@@ -49,7 +49,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         suggested_display_precision=0,
         endpoint="sys",
-        property="cpuTemp",
+        property="cpu_temp",
     ),
     MikrotikSwitchOSEntityDescription(
         key="psu1_current",
@@ -59,7 +59,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
         suggested_display_precision=0,
         endpoint="sys",
-        property="psu1Current",
+        property="psu1_current",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
@@ -70,7 +70,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         suggested_display_precision=2,
         endpoint="sys",
-        property="psu1Voltage",
+        property="psu1_voltage",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
@@ -81,7 +81,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfPower.WATT,
         suggested_display_precision=1,
         endpoint="sys",
-        property="psu1Power",
+        property="psu1_power",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
@@ -92,7 +92,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
         suggested_display_precision=0,
         endpoint="sys",
-        property="psu2Current",
+        property="psu2_current",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
@@ -103,7 +103,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         suggested_display_precision=2,
         endpoint="sys",
-        property="psu2Voltage",
+        property="psu2_voltage",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
@@ -114,7 +114,7 @@ GLOBAL_SENSORS: tuple[MikrotikSwitchOSEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfPower.WATT,
         suggested_display_precision=1,
         endpoint="sys",
-        property="psu2Power",
+        property="psu2_power",
         enabled_by_default=lambda api: api.poe is not None,
     ),
     MikrotikSwitchOSEntityDescription(
