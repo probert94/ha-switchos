@@ -45,6 +45,7 @@ It also reads information about the ports, including the customized name which i
 ### Compatibility
 
 The integration has been tested with:
-| Model | Versions |
-| - | - |
-| CSS610-8P-2S+ | 2.20 |
+| Model | OS | Versions |
+| - | - | - |
+| CRS326-24G-2S+ | SwitchOS | 2.18 |
+| CSS610-8P-2S+ | SwitchOS Lite | 2.20, 2.21 |
