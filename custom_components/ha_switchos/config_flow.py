@@ -35,7 +35,7 @@ class MikrotikSwitchOSConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self._async_abort_entries_match({CONF_HOST: user_input[CONF_HOST]})
             try:
-                await test_connection(user_input)
+                await test_connection(self.hass, user_input)
             except CannotConnect:
                 errors[CONF_HOST] = "cannot_connect"
             except AuthError:
@@ -71,7 +71,7 @@ class MikrotikSwitchOSConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         reauth_entry = self._get_reauth_entry()
         if user_input is not None:
             try:
-                await test_connection(user_input)
+                await test_connection(self.hass, user_input)
             except CannotConnect:
                 errors["base"] = "cannot_connect"
             except AuthError:

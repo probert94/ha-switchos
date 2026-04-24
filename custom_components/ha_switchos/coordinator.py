@@ -10,7 +10,7 @@ from python_switchos.client import Client
 from python_switchos.endpoints.link import LinkEndpoint
 from python_switchos.endpoints.poe import PoEEndpoint
 from python_switchos.endpoints.sys import SystemEndpoint
-from python_switchos.http import createHttpClient
+from python_switchos.http import create_httpx_client
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -21,6 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
@@ -39,7 +40,7 @@ class MikrotikSwitchOSData:
         """Initialize the Mikrotik Client."""
         self.hass = hass
         self.config_entry = config_entry
-        self.client = _create_client(config_entry.data)
+        self.client = _create_client(hass, config_entry.data)
         self.device: SystemEndpoint | None = None
         self.sys: SystemEndpoint | None = None
         self.link: LinkEndpoint | None = None
@@ -158,11 +159,11 @@ class MikrotikSwitchOSDevice:
         self.ports = ports
 
 
-async def test_connection(entry: dict[str, Any]) -> None:
+async def test_connection(hass: HomeAssistant, entry: dict[str, Any]) -> None:
     """Test connection to API with given settings."""
     _LOGGER.debug("Connecting to Mikrotik SwitchOS [%s]", entry[CONF_HOST])
 
-    client = _create_client(entry)
+    client = _create_client(hass, entry)
     try:
         await client.fetch(SystemEndpoint)
     except HTTPStatusError as err:
@@ -172,7 +173,7 @@ async def test_connection(entry: dict[str, Any]) -> None:
         raise CannotConnect from err
 
 
-def _create_client(entry: dict[str, Any]) -> Client:
+def _create_client(hass: HomeAssistant, entry: dict[str, Any]) -> Client:
     auth = DigestAuth(entry[CONF_USERNAME], entry[CONF_PASSWORD])
-    httpClient: AsyncClient = AsyncClient(auth=auth)
-    return Client(createHttpClient(httpClient), entry[CONF_HOST])
+    httpClient: AsyncClient = get_async_client(hass)
+    return Client(create_httpx_client(httpClient, auth), entry[CONF_HOST])
